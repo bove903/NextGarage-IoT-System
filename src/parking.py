@@ -217,7 +217,7 @@ class SmartParking:
             self.ir_entrance,
             self.ir_exit,
             self.traffic_light,
-            self.gate_button
+            self.gate_button, is_parking_full_cb=lambda: self.car_parked
         )
         
         self.parking_leds = ParkingLeds(
