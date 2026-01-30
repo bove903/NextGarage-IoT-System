@@ -3,16 +3,14 @@ import machine
 
 class ParkingLight:
     def __init__(self, pin):
-        self.led = machine.PWM(machine.Pin(pin))
-        self.led.freq(1000)
+        self.led = machine.Pin(pin, machine.Pin.OUT)
         self.brightness = 0
         self.off()
-        
+
     def on(self, brightness=100):
-        self.brightness = min(100, max(0, brightness))
-        duty = int(self.brightness * 10.23)
-        self.led.duty(duty)
-        
+        self.brightness = 100
+        self.led.on()
+
     def off(self):
-        self.led.duty(0)
+        self.led.off()
         self.brightness = 0
