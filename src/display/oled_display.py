@@ -1,4 +1,5 @@
 import machine
+import network
 import time
 import framebuf
 from ssd1306 import SSD1306_I2C
@@ -217,7 +218,8 @@ class OLEDDisplay:
             self.display.text(f"{lux_level:.0f} lx", x_val, y)
         
         self.display.hline(0, 54, 128, 1)
-        self.display.text("Sistema Online", 10, 56)
+        status = "Sistema Online" if self._is_wifi_connected() else "Sistema Offline"
+        self.display.text(status, 10, 56)
         self.show()
 
     def show_parking_assist(self, distance):
@@ -271,3 +273,11 @@ class OLEDDisplay:
         self.display.hline(0, 10, 128, 1)
         self.display.text(error_msg, 0, 25)
         self.show()
+    
+    def _is_wifi_connected(self):
+        """Ritorna True se la STA WiFi è connessa."""
+        try:
+            wlan = network.WLAN(network.STA_IF)
+            return wlan.active() and wlan.isconnected()
+        except:
+            return False
