@@ -396,7 +396,6 @@ This project is developed for educational purposes as part of the IoT course at 
 
 ## 📸 Project Images
 
-### System Components
 <p align="center">
   <img src="images/Totale.jpg" alt="Totale" width="400">
   <img src="images/Entrata.jpg" alt="Entrata" width="400">
