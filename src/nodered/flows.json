@@ -1,0 +1,633 @@
+[
+    {
+        "id": "tab_parking_ultimate",
+        "type": "tab",
+        "label": "NextGarage",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "mqtt_out_u",
+        "type": "mqtt out",
+        "z": "tab_parking_ultimate",
+        "name": "MQTT Pub",
+        "topic": "",
+        "qos": "1",
+        "retain": "false",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "hivemq_broker_u",
+        "x": 1070,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "mqtt_in_all_u",
+        "type": "mqtt in",
+        "z": "tab_parking_ultimate",
+        "name": "Rx Tutto",
+        "topic": "parking/#",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "hivemq_broker_u",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 100,
+        "y": 360,
+        "wires": [
+            [
+                "trigger_wd_u",
+                "switch_topics_u",
+                "func_logger_u"
+            ]
+        ]
+    },
+    {
+        "id": "trigger_wd_u",
+        "type": "trigger",
+        "z": "tab_parking_ultimate",
+        "name": "Watchdog 5s",
+        "op1": "ONLINE",
+        "op2": "OFFLINE",
+        "op1type": "str",
+        "op2type": "str",
+        "duration": "5",
+        "extend": true,
+        "overrideDelay": false,
+        "units": "s",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "status",
+        "outputs": 1,
+        "x": 350,
+        "y": 80,
+        "wires": [
+            [
+                "ui_wifi_icon"
+            ]
+        ]
+    },
+    {
+        "id": "ui_wifi_icon",
+        "type": "ui_template",
+        "z": "tab_parking_ultimate",
+        "group": "grp_cmd_status",
+        "name": "Icona WiFi",
+        "order": 1,
+        "width": 6,
+        "height": 1,
+        "format": "<div style=\"display: flex; align-items: center; justify-content: center; height: 100%;\">\n    <i class=\"material-icons\" \n       style=\"font-size: 24px; margin-right: 10px; color: {{msg.payload == 'ONLINE' ? '#4CAF50' : '#F44336'}};\">\n       wifi\n    </i>\n    <span style=\"font-weight: bold; color: {{msg.payload == 'ONLINE' ? '#4CAF50' : '#F44336'}};\">\n        SISTEMA: {{msg.payload}}\n    </span>\n</div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "x": 630,
+        "y": 80,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "btn_open_u",
+        "type": "ui_button",
+        "z": "tab_parking_ultimate",
+        "name": "Apri",
+        "group": "grp_cmd_status",
+        "order": 2,
+        "width": 3,
+        "height": 2,
+        "passthru": false,
+        "label": "APRI",
+        "tooltip": "Alza sbarra",
+        "color": "#ffffff",
+        "bgcolor": "#28a745",
+        "className": "",
+        "icon": "fa-arrow-up",
+        "payload": "1",
+        "payloadType": "str",
+        "topic": "parking/cmd/open_gate",
+        "topicType": "str",
+        "x": 610,
+        "y": 140,
+        "wires": [
+            [
+                "mqtt_out_u"
+            ]
+        ]
+    },
+    {
+        "id": "btn_close_u",
+        "type": "ui_button",
+        "z": "tab_parking_ultimate",
+        "name": "Chiudi",
+        "group": "grp_cmd_status",
+        "order": 3,
+        "width": 3,
+        "height": 2,
+        "passthru": false,
+        "label": "CHIUDI",
+        "tooltip": "Abbassa sbarra",
+        "color": "#ffffff",
+        "bgcolor": "#dc3545",
+        "className": "",
+        "icon": "fa-arrow-down",
+        "payload": "1",
+        "payloadType": "str",
+        "topic": "parking/cmd/close_gate",
+        "topicType": "str",
+        "x": 610,
+        "y": 200,
+        "wires": [
+            [
+                "mqtt_out_u"
+            ]
+        ]
+    },
+    {
+        "id": "switch_topics_u",
+        "type": "switch",
+        "z": "tab_parking_ultimate",
+        "name": "Filtra Dati",
+        "property": "topic",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "parking/state/gate",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "parking/state/spot",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "parking/ultrasonic/distance",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "parking/env/light",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "parking/alarms/gas",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "parking/sensors/gas",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "parking/cfg/mq2_threshold",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "parking/cfg/mq2_hyst",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "parking/cfg/lux_threshold",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 9,
+        "x": 340,
+        "y": 360,
+        "wires": [
+            [
+                "txt_gate_u"
+            ],
+            [
+                "txt_spot_u"
+            ],
+            [
+                "gauge_dist_u"
+            ],
+            [
+                "gauge_lux_u"
+            ],
+            [
+                "txt_gas_alarm_u"
+            ],
+            [
+                "gauge_gas_u"
+            ],
+            [
+                "num_mq2_smart"
+            ],
+            [
+                "num_hyst_smart"
+            ],
+            [
+                "num_lux_smart"
+            ]
+        ]
+    },
+    {
+        "id": "txt_gate_u",
+        "type": "ui_text",
+        "z": "tab_parking_ultimate",
+        "group": "grp_cmd_status",
+        "order": 4,
+        "width": 6,
+        "height": 1,
+        "name": "Stato Sbarra",
+        "label": "Sbarra:",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 630,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "txt_spot_u",
+        "type": "ui_text",
+        "z": "tab_parking_ultimate",
+        "group": "grp_cmd_status",
+        "order": 5,
+        "width": 6,
+        "height": 1,
+        "name": "Stato Posto",
+        "label": "Posto:",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 630,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "gauge_dist_u",
+        "type": "ui_gauge",
+        "z": "tab_parking_ultimate",
+        "name": "Distanza",
+        "group": "grp_sensors_live",
+        "order": 1,
+        "width": 6,
+        "height": 4,
+        "gtype": "gage",
+        "title": "Distanza (cm)",
+        "label": "cm",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "8",
+        "colors": [
+            "#ca3838",
+            "#e6e600",
+            "#00b500"
+        ],
+        "seg1": "3",
+        "seg2": "5",
+        "x": 620,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "gauge_lux_u",
+        "type": "ui_gauge",
+        "z": "tab_parking_ultimate",
+        "name": "Luminosità",
+        "group": "grp_sensors_live",
+        "order": 2,
+        "width": 6,
+        "height": 4,
+        "gtype": "gage",
+        "title": "Luminosità",
+        "label": "lux",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "1000",
+        "colors": [
+            "#001f3f",
+            "#0074d9",
+            "#7fdbff"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "x": 630,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "gauge_gas_u",
+        "type": "ui_gauge",
+        "z": "tab_parking_ultimate",
+        "name": "Livello Gas",
+        "group": "grp_sensors_live",
+        "order": 3,
+        "width": 6,
+        "height": 3,
+        "gtype": "wave",
+        "title": "Livello Gas (RAW)",
+        "label": "",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "4095",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "1200",
+        "seg2": "1500",
+        "diff": false,
+        "className": "",
+        "x": 630,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "txt_gas_alarm_u",
+        "type": "ui_text",
+        "z": "tab_parking_ultimate",
+        "group": "grp_sensors_live",
+        "order": 4,
+        "width": 6,
+        "height": 1,
+        "name": "Allarme Gas",
+        "label": "ALLARME:",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "x": 630,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "num_mq2_smart",
+        "type": "ui_numeric",
+        "z": "tab_parking_ultimate",
+        "name": "Cfg Soglia Gas",
+        "label": "Soglia MQ2 (0-4095)",
+        "group": "grp_config_smart",
+        "order": 1,
+        "width": 6,
+        "height": 1,
+        "wrap": false,
+        "passthru": true,
+        "topic": "parking/cfg/mq2_threshold",
+        "topicType": "str",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "4095",
+        "step": 50,
+        "x": 640,
+        "y": 600,
+        "wires": [
+            [
+                "mqtt_out_u"
+            ]
+        ]
+    },
+    {
+        "id": "num_hyst_smart",
+        "type": "ui_numeric",
+        "z": "tab_parking_ultimate",
+        "name": "Cfg Isteresi",
+        "label": "Isteresi Gas",
+        "group": "grp_config_smart",
+        "order": 2,
+        "width": 6,
+        "height": 1,
+        "wrap": false,
+        "passthru": true,
+        "topic": "parking/cfg/mq2_hyst",
+        "topicType": "str",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "500",
+        "step": 10,
+        "x": 630,
+        "y": 660,
+        "wires": [
+            [
+                "mqtt_out_u"
+            ]
+        ]
+    },
+    {
+        "id": "num_lux_smart",
+        "type": "ui_numeric",
+        "z": "tab_parking_ultimate",
+        "name": "Cfg Soglia Luce",
+        "label": "Soglia Luce (lux)",
+        "group": "grp_config_smart",
+        "order": 3,
+        "width": 6,
+        "height": 1,
+        "wrap": false,
+        "passthru": true,
+        "topic": "parking/cfg/lux_threshold",
+        "topicType": "str",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "1000",
+        "step": 10,
+        "x": 640,
+        "y": 720,
+        "wires": [
+            [
+                "mqtt_out_u"
+            ]
+        ]
+    },
+    {
+        "id": "drop_mode_smart",
+        "type": "ui_dropdown",
+        "z": "tab_parking_ultimate",
+        "name": "Light Mode",
+        "label": "Modalità Luci",
+        "tooltip": "",
+        "group": "grp_config_smart",
+        "order": 4,
+        "width": 6,
+        "height": 1,
+        "passthru": true,
+        "multiple": false,
+        "options": [
+            {
+                "label": "AUTO (Sensore)",
+                "value": "AUTO",
+                "type": "str"
+            },
+            {
+                "label": "SEMPRE ACCESE",
+                "value": "ON",
+                "type": "str"
+            },
+            {
+                "label": "SEMPRE SPENTE",
+                "value": "OFF",
+                "type": "str"
+            }
+        ],
+        "payload": "",
+        "topic": "parking/cmd/parking_light_mode",
+        "topicType": "str",
+        "x": 630,
+        "y": 780,
+        "wires": [
+            [
+                "mqtt_out_u"
+            ]
+        ]
+    },
+    {
+        "id": "btn_reset_smart",
+        "type": "ui_button",
+        "z": "tab_parking_ultimate",
+        "name": "Reset",
+        "group": "grp_config_smart",
+        "order": 5,
+        "width": 6,
+        "height": 1,
+        "passthru": false,
+        "label": "RIPRISTINA DEFAULT",
+        "tooltip": "Ripristina soglie",
+        "color": "#ffffff",
+        "bgcolor": "#ff9800",
+        "icon": "restore",
+        "payload": "1",
+        "payloadType": "str",
+        "topic": "parking/cmd/reset_config",
+        "x": 620,
+        "y": 840,
+        "wires": [
+            [
+                "mqtt_out_u"
+            ]
+        ]
+    },
+    {
+        "id": "func_logger_u",
+        "type": "function",
+        "z": "tab_parking_ultimate",
+        "name": "Logger Pro",
+        "func": "// 1. Recupera lo storico e la MEMORIA DEGLI STATI PRECEDENTI\nvar history = flow.get('history') || [];\nvar lastStates = flow.get('lastStates') || {}; // Qui salviamo come erano le cose un attimo fa\n\nvar now = new Date();\nvar timeString = now.toLocaleTimeString('it-IT');\nvar topic = msg.topic;\nvar payload = msg.payload;\n\n// Variabili per decidere se scrivere o no\nvar shouldLog = false; \nvar text = \"\";\nvar icon = \"\";\nvar color = \"#ccc\";\n\n// --- LOGICA INTELLIGENTE: CONTROLLA SE È CAMBIATO ---\n\n// 1. GESTIONE SBARRA\nif (topic.includes(\"state/gate\")) {\n    // Se lo stato attuale è UGUALE a quello salvato in memoria... FERMATI!\n    if (lastStates.gate === payload) return null;\n    \n    // Se è diverso, aggiorniamo la memoria e prepariamo il log\n    lastStates.gate = payload; \n    shouldLog = true;\n    \n    text = \"Sbarra: \" + payload;\n    icon = payload.includes(\"APERTA\") ? \"🔓\" : \"🔒\";\n    color = payload.includes(\"APERTA\") ? \"#4CAF50\" : \"#F44336\";\n} \n\n// 2. GESTIONE POSTO AUTO\nelse if (topic.includes(\"state/spot\")) {\n    // Controllo duplicati\n    if (lastStates.spot === payload) return null;\n    \n    lastStates.spot = payload;\n    shouldLog = true;\n    \n    text = \"Posto: \" + payload;\n    icon = payload.includes(\"OCCUPATO\") ? \"🚗\" : \"✅\";\n    color = payload.includes(\"OCCUPATO\") ? \"#FF9800\" : \"#4CAF50\";\n}\n\n// 3. GESTIONE ALLARME GAS\nelse if (topic.includes(\"alarms/gas\")) {\n    // Se arriva \"OK\" (tutto tranquillo), resettiamo lo stato di allarme in memoria ma non logghiamo \"Tutto ok\"\n    if (payload == \"OK\") {\n         lastStates.gas = \"OK\";\n         return null; \n    }\n    \n    // Logghiamo SOLO se prima non c'era allarme (evita spam mentre suona)\n    if (lastStates.gas !== \"ALARM\") {\n        lastStates.gas = \"ALARM\";\n        shouldLog = true;\n        text = \"⚠️ ALLARME GAS RILEVATO!\";\n        icon = \"🔥\";\n        color = \"#F44336\";\n    } else {\n        return null; // L'allarme sta ancora suonando, non riscriverlo\n    }\n}\n\n// 4. RESET (Questo lo vogliamo vedere sempre)\nelse if (topic.includes(\"cmd/reset_config\")) {\n    shouldLog = true;\n    text = \"Reset Configurazione\";\n    icon = \"♻️\";\n    color = \"#2196F3\";\n    // Resettiamo anche la memoria degli stati per sicurezza\n    lastStates = {}; \n}\n\n// Se non c'è nulla di nuovo da dire, esci\nif (!shouldLog) return null;\n\n// --- SALVA I NUOVI STATI IN MEMORIA ---\nflow.set('lastStates', lastStates);\n\n// --- SCRIVI NEL LOG (HTML) ---\nvar entry = `<div style='border-bottom: 1px solid #444; padding: 6px; color: ${color}; font-size: 13px;'>\n             <span style='color: #888; font-size: 11px;'>${timeString}</span> ${icon} ${text}</div>`;\n\nhistory.unshift(entry);\n// Tieni solo gli ultimi 12 eventi per non intasare\nif (history.length > 12) history.pop();\n\nflow.set('history', history);\nmsg.payload = history.join(\"\");\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 920,
+        "wires": [
+            [
+                "ui_log_u"
+            ]
+        ]
+    },
+    {
+        "id": "ui_log_u",
+        "type": "ui_template",
+        "z": "tab_parking_ultimate",
+        "group": "grp_history",
+        "name": "Log View",
+        "order": 1,
+        "width": 6,
+        "height": 6,
+        "format": "<div style=\"font-family: sans-serif;\">\n    <div ng-bind-html=\"msg.payload\"></div>\n</div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "x": 620,
+        "y": 920,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "hivemq_broker_u",
+        "type": "mqtt-broker",
+        "name": "HiveMQ public",
+        "broker": "broker.hivemq.com",
+        "port": "1883",
+        "clientid": "nextgarage-ultimate-user",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    },
+    {
+        "id": "grp_cmd_status",
+        "type": "ui_group",
+        "name": "Comandi e Stato",
+        "tab": "tab_dash_u",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "grp_sensors_live",
+        "type": "ui_group",
+        "name": "Sensori Live",
+        "tab": "tab_dash_u",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "grp_config_smart",
+        "type": "ui_group",
+        "name": "Configurazione soglie e Reset",
+        "tab": "tab_dash_u",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "grp_history",
+        "type": "ui_group",
+        "name": "Storico Eventi",
+        "tab": "tab_dash_u",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "tab_dash_u",
+        "type": "ui_tab",
+        "name": "NextGarage Dashboard",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "0fccb5480ac011cf",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-dashboard": "3.6.6"
+        }
+    }
+]
