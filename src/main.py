@@ -4,10 +4,7 @@ import gc
 import sys
 
 def main():
-    # Stampa un header iniziale per rendere subito riconoscibile l'avvio del sistema in seriale.
-    print("=" * 50)
-    print("SMART PARKING SYSTEM - Starting...")
-    print("=" * 50)
+    print("NextGarage - Starting...")
     
     # Step-by-step initialization con dettagli errore:
     # L'idea è inizializzare il sistema a "passi", stampando dove si è arrivati.
@@ -43,7 +40,7 @@ def main():
     except ImportError as e:
         # Gestione mirata per errori di import:
         # utile per capire subito quale modulo manca o non è stato caricato correttamente.
-        print(f"❌ IMPORT ERROR: {e}")
+        print(f"IMPORT ERROR: {e}")
         print(f"   Missing module: {str(e)}")
         # Stampa stacktrace completo con sys.print_exception (MicroPython-friendly).
         sys.print_exception(e)
@@ -51,14 +48,14 @@ def main():
     except AttributeError as e:
         # Gestione mirata per errori di attributo:
         # tipico quando un oggetto non ha un metodo/variabile attesa (refusi o version mismatch).
-        print(f"❌ ATTRIBUTE ERROR: {e}")
+        print(f"ATTRIBUTE ERROR: {e}")
         print(f"   Check class methods and variables")
         sys.print_exception(e)
         
     except Exception as e:
         # Catch-all per qualsiasi altro errore non previsto.
         # Stampa tipo eccezione + messaggio + stacktrace per debug completo.
-        print(f"❌ FATAL ERROR: {type(e).__name__}")
+        print(f"FATAL ERROR: {type(e).__name__}")
         print(f"   Message: {e}")
         print(f"   Details:")
         sys.print_exception(e)
@@ -81,10 +78,7 @@ def main():
             # Se non è possibile usare il LED, ignora (robustezza su diverse board).
             pass
             
-        # Log finale: annuncia reset per riportare il sistema in uno stato noto.
-        print("\n" + "=" * 50)
         print("System will reset in 5 seconds...")
-        print("=" * 50)
         
         # Attesa 5 secondi prima del reset: dà tempo di leggere l'errore in seriale.
         time.sleep(5)
@@ -92,7 +86,5 @@ def main():
         # Reset hardware del microcontrollore.
         machine.reset()
 
-# Entry point standard Python:
-# se il file è eseguito come script principale, avvia main().
 if __name__ == "__main__":
     main()

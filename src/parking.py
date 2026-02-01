@@ -59,17 +59,12 @@ class SmartParking:
         # Se non esiste ancora un display associato all'istanza, lo crea.
         # hasattr evita doppia inizializzazione (utile perché connect_wifi è chiamato nel costruttore).
         if not hasattr(self, 'display'):
-            self.display = OLEDDisplay(
-                self.config.PIN_SDA,
-                self.config.PIN_SCL,
-                self.config.OLED_WIDTH,
-                self.config.OLED_HEIGHT
-            )
+            self.display = OLEDDisplay(self.config.PIN_SDA, self.config.PIN_SCL, self.config.OLED_WIDTH, self.config.OLED_HEIGHT)
 
-        # Mostra l'icona di connessione WiFi sul display (feedback utente immediato).
+        # Mostra l'icona di connessione WiFi sul display
         self.display.show_wifi_connecting()
 
-        # Inizializza l'interfaccia WiFi in modalità Station (STA_IF).
+        # Inizializza l'interfaccia WiFi
         wlan = network.WLAN(network.STA_IF)
         wlan.active(True)
 
@@ -89,7 +84,6 @@ class SmartParking:
             self.wifi_connected = True
             ip = wlan.ifconfig()[0]
             print(f"WiFi connected! IP: {ip}")
-            # NOTA: qui l'IP non viene mostrato sul display; il flusso prosegue verso initialize_components().
         else:
             print("WiFi connection failed!")
             self.display.show_error("WiFi FAILED")
@@ -117,7 +111,7 @@ class SmartParking:
             else:
                 # Connessione fallita: segnala errore e disabilita mqtt per evitare uso successivo.
                 print("MQTT connection failed")
-                self.display.show_error("MQTT FAIL")	# show_error esiste ancora
+                self.display.show_error("MQTT FAIL")
                 self.mqtt = None
         except Exception as e:
             # Qualsiasi eccezione in fase di setup viene gestita:
@@ -158,7 +152,7 @@ class SmartParking:
             # --- RESET CONFIGURAZIONE ---
             # Ripristina soglie di default e aggiorna Node-RED pubblicando valori retained.
             elif topic == "parking/cmd/reset_config":
-                print("♻️ RESET COMPLETO CONFIGURAZIONE...")
+                print("RESET COMPLETO CONFIGURAZIONE...")
                 # Valori di Default
                 DEFAULT_MQ2_THRESH = 1500
                 DEFAULT_MQ2_HYST = 100
@@ -174,7 +168,7 @@ class SmartParking:
                     self.mqtt.publish("parking/cfg/mq2_threshold", str(DEFAULT_MQ2_THRESH), retain=True)
                     self.mqtt.publish("parking/cfg/mq2_hyst", str(DEFAULT_MQ2_HYST), retain=True)
                     self.mqtt.publish("parking/cfg/lux_threshold", str(DEFAULT_LUX_THRESH), retain=True)
-                print("✅ Reset completato.")
+                print("Reset completato.")
 
             # --- GESTIONE CONFIGURAZIONE GENERICA ---
             # Gestisce topic del tipo "parking/cfg/<param>" tipici di slider/barre su Node-RED.
@@ -231,10 +225,7 @@ class SmartParking:
         self.ir_exit = IRSensor(self.config.PIN_IR_EXIT, "Exit")
 
         # Sensore ultrasuoni (trig/echo) per distanza nel posto auto.
-        self.ultrasonic = UltrasonicSensor(
-            self.config.PIN_ULTRASONIC_TRIG,
-            self.config.PIN_ULTRASONIC_ECHO
-        )
+        self.ultrasonic = UltrasonicSensor(self.config.PIN_ULTRASONIC_TRIG, self.config.PIN_ULTRASONIC_ECHO)
 
         # Sensore gas MQ-2 (ADC).
         self.mq2 = MQ2Sensor(self.config.PIN_MQ2)
@@ -242,8 +233,7 @@ class SmartParking:
         # --- SENSORE LUMINOSITÀ (I2C) ---
         # Inizializzazione protetta: se fallisce, brightness_sensor diventa None e il sistema continua.
         try:
-            i2c = machine.I2C(0, sda=machine.Pin(self.config.PIN_SDA),
-                             scl=machine.Pin(self.config.PIN_SCL))
+            i2c = machine.I2C(0, sda=machine.Pin(self.config.PIN_SDA), scl=machine.Pin(self.config.PIN_SCL))
             self.brightness_sensor = BrightnessSensor(i2c, self.config.TSL2561_ADDRESS)
         except Exception as e:
             print(f"Brightness sensor init error: {e}")
@@ -251,11 +241,7 @@ class SmartParking:
 
         # --- ATTUATORI ---
         # Semaforo (rosso/giallo/verde).
-        self.traffic_light = TrafficLight(
-            self.config.PIN_TRAFFIC_RED,
-            self.config.PIN_TRAFFIC_YELLOW,
-            self.config.PIN_TRAFFIC_GREEN
-        )
+        self.traffic_light = TrafficLight(self.config.PIN_TRAFFIC_RED, self.config.PIN_TRAFFIC_YELLOW, self.config.PIN_TRAFFIC_GREEN)
 
         # Pulsante sbarra (richiesta apertura ingresso).
         self.gate_button = Button(self.config.PIN_GATE_BUTTON, name="Gate Button")
@@ -263,19 +249,10 @@ class SmartParking:
         # ServoGate gestisce la macchina a stati della sbarra.
         # is_parking_full_cb usa lambda che ritorna self.car_parked:
         # - se il posto è occupato, il parcheggio viene considerato "pieno" per l'ingresso.
-        self.servo = ServoGate(
-            self.config.PIN_SERVO,
-            self.ir_entrance,
-            self.ir_exit,
-            self.traffic_light,
-            self.gate_button, is_parking_full_cb=lambda: self.car_parked
-        )
+        self.servo = ServoGate(self.config.PIN_SERVO, self.ir_entrance, self.ir_exit, self.traffic_light, self.gate_button, is_parking_full_cb=lambda: self.car_parked)
 
         # LED parcheggio (rosso/verde) per stato posto libero/occupato.
-        self.parking_leds = ParkingLeds(
-            self.config.PIN_PARKING_RED,
-            self.config.PIN_PARKING_GREEN
-        )
+        self.parking_leds = ParkingLeds(self.config.PIN_PARKING_RED, self.config.PIN_PARKING_GREEN)
 
         # Buzzer (PWM) per assistenza parcheggio e allarme gas.
         self.buzzer = Buzzer(self.config.PIN_BUZZER)
@@ -294,11 +271,7 @@ class SmartParking:
 
         # Sistema pronto: aggiorna stato e mostra schermata principale.
         self.state = "READY"
-        self.display.show_main_screen(
-            gate_status=self.servo.is_open(),
-            parking_status=self.car_parked,
-            gas_level=self.mq2.read_percentage()
-        )
+        self.display.show_main_screen(gate_status=self.servo.is_open(), parking_status=self.car_parked, gas_level=self.mq2.read_percentage())
         print("System ready")
 
     def set_initial_state(self):
@@ -320,7 +293,7 @@ class SmartParking:
         self.free_timer = 0
 
     def run(self):
-        """Main system loop - PRIORITY MODE + RESET 5s"""
+        """Main system loop"""
         print("Starting main loop...")
         self.state = "RUNNING"
 
@@ -373,8 +346,8 @@ class SmartParking:
             press_type = self.master_button.get_press_type(long_duration=5000)
 
             if press_type == "long_press":
-                print("🔘 PULSANTE MASTER: Pressione lunga rilevata (5s)")
-                print("🔄 Avvio procedura di RESET...")
+                print("PULSANTE MASTER: Pressione lunga rilevata (5s)")
+                print("Avvio procedura di RESET...")
                 self.system_reset() # Riavvia il microcontrollore dopo aver mostrato grafica.
 
             # Sensori distanza: ogni 200ms (gestione occupato/libero + assistenza parcheggio).
@@ -495,7 +468,7 @@ class SmartParking:
                 # Avvia timer di conferma occupazione se non è già partito.
                 if self.occupied_timer == 0:
                     self.occupied_timer = now
-                    print(f"⏱️ Stop rilevato ({distance:.1f}cm). Attesa stabilità...")
+                    print(f"Stop rilevato ({distance:.1f}cm). Attesa stabilità...")
 
                 # Conferma occupazione solo se la condizione resta valida per ULTRASONIC_OCCUPIED_CONFIRM ms.
                 if time.ticks_diff(now, self.occupied_timer) >= self.config.ULTRASONIC_OCCUPIED_CONFIRM:
@@ -505,7 +478,7 @@ class SmartParking:
                     self.parking_assist = False
                     self.buzzer.stop_parking_assist()
                     self.occupied_timer = 0
-                    print(f"🚗 PARCHEGGIO COMPLETATO")
+                    print(f"PARCHEGGIO COMPLETATO")
 
                     # Pubblica stato su MQTT (retain=True) così la dashboard vede l'ultimo stato.
                     if self.mqtt: self.mqtt.publish('state/spot', 'OCCUPATO', retain=True)
@@ -551,7 +524,7 @@ class SmartParking:
                     self.car_parked = False
                     self.parking_leds.set_free()
                     self.free_timer = 0
-                    print(f"✅ POSTO LIBERATO")
+                    print(f"POSTO LIBERATO")
                     if self.mqtt: self.mqtt.publish('state/spot', 'LIBERO', retain=True)
             else:
                 # Se rientra nella zona, resetta il timer: richiesta continuità della condizione.
@@ -566,14 +539,14 @@ class SmartParking:
         # - entra in allarme quando supera MQ2_THRESHOLD
         # - esce dall'allarme solo quando scende sotto (MQ2_THRESHOLD - MQ2_HYSTERESIS)
         if not self.gas_alarm and gas_raw > self.config.MQ2_THRESHOLD:
-            print(f"⚠️ GAS ALARM! Raw: {gas_raw}")
+            print(f"GAS ALARM! Raw: {gas_raw}")
             self.gas_alarm = True
             # Avvia buzzer in modalità allarme con frequenza/interval specifici per il gas.
             self.buzzer.start_alarm(freq=2500, interval=300)  # Suono diverso per gas
             self.alarm_led.on()
 
         elif self.gas_alarm and gas_raw < (self.config.MQ2_THRESHOLD - self.config.MQ2_HYSTERESIS):
-            print(f"✅ Gas alarm cleared. Raw: {gas_raw}")
+            print(f"Gas alarm cleared. Raw: {gas_raw}")
             self.gas_alarm = False
             self.buzzer.stop_alarm()
             self.alarm_led.off()
@@ -702,10 +675,4 @@ class SmartParking:
             distance = self.ultrasonic.distance_cm()
             self.display.show_parking_assist(distance)
         else:
-            self.display.show_main_screen(
-                gate_status=gate_open,
-                parking_status=self.car_parked,
-                gas_level=gas_raw,	# Mostra valore RAW
-                alarm_active=self.gas_alarm,
-                lux_level=lux_level
-            )
+            self.display.show_main_screen(gate_status=gate_open, parking_status=self.car_parked, gas_level=gas_raw, alarm_active=self.gas_alarm, lux_level=lux_level)

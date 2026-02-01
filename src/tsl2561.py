@@ -57,15 +57,8 @@ class TSL2561:
         self.set_gain(self.gain)
 
     def _check_presence(self):
-        """
-        Presence check robusto:
-        - basta riuscire a leggere l'ID senza eccezioni
-        - scarta i casi tipici di bus 'vuoto' (0x00 / 0xFF)
-        """
         try:
             id_reg = self._read_byte(TSL2561_COMMAND_BIT | TSL2561_REGISTER_ID)
-            # opzionale: stampa per debug
-            # print("TSL2561 ID:", hex(id_reg))
 
             if id_reg in (0x00, 0xFF):
                 return False
@@ -136,7 +129,6 @@ class TSL2561:
         return ch0, ch1
 
     def read_lux(self):
-        """Calculate lux from raw readings (semplificato)."""
         ch0, ch1 = self.read_raw()
 
         # saturazione

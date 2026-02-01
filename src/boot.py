@@ -5,9 +5,7 @@ import gc
 
 def boot():
     """System boot sequence"""
-    print("=" * 40)
-    print("Smart Parking System Booting...")
-    print("=" * 40)
+    print("NextGarage System Booting...")
     
     # Enable garbage collection
     gc.enable()

@@ -36,18 +36,13 @@ class MQTTHandler:
             # - client_id fisso (identifica il dispositivo sul broker)
             # - server/port del broker
             # - keepalive=60 (ping periodico per mantenere la sessione attiva)
-            self.client = UMQTTClient(
-                client_id="nextgarage-esp32",
-                server=broker,
-                port=port,
-                keepalive=60
-            )
+            self.client = UMQTTClient(client_id="nextgarage-esp32", server=broker, port=port, keepalive=60)
             
             # Imposta la callback interna che verrà chiamata dal client quando arrivano messaggi.
             # Questa callback poi inoltra i messaggi a on_message_callback (se definita).
             self.client.set_callback(self._on_message)
             
-            # Connessione al broker (operazione che può sollevare eccezioni).
+            # Connessione al broker
             self.client.connect()
             self.connected = True
             print(f"MQTT connected to {broker}:{port}")

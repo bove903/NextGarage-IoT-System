@@ -235,7 +235,7 @@ class ServoGate:
             # Se il sensore di uscita rileva un veicolo (convenzione: 0 = rilevato),
             # la sbarra si apre indipendentemente dal fatto che il parcheggio sia pieno.
             if self.ir_exit.pin.value() == 0:
-                print("🚗 Auto in uscita rilevata -> Apertura Automatica")
+                print("Auto in uscita rilevata -> Apertura Automatica")
                 self.state = self.STATE_OPENING
                 self.target_angle = self.SERVO_UP
                 self.last_servo_move = now
