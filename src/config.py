@@ -39,8 +39,8 @@ class Config:
     TSL2561_ADDRESS = 0x39
     
     # WiFi Settings
-    WIFI_SSID = "iPhone di Chris"
-    WIFI_PASSWORD = "christianbove"
+    WIFI_SSID = ""
+    WIFI_PASSWORD = ""
     
     # MQTT Settings (usa broker pubblico HiveMQ)
     MQTT_BROKER = "broker.hivemq.com"
